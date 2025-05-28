@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control de Stock</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <h1>Control de Stock - Almacén</h1>
+
+  <div id="turnoControles" class="center-buttons">
+    <button onclick="abrirTurno()">Abrir Turno</button>
+    <button onclick="cerrarTurno()">Cerrar Turno</button>
+  </div>
+
+  <h3 id="estadoTurno">Turno cerrado</h3>
+
+  <form id="productForm">
+    <input type="text" id="name" placeholder="Nombre del producto" required />
+    <input type="number" id="price" placeholder="Precio" required min="0" />
+    <input type="number" id="quantity" placeholder="Cantidad" required min="0" />
+    <button type="submit">Agregar Producto</button>
+  </form>
+
+  <input type="text" id="buscador" placeholder="Buscar producto..." oninput="filtrarProductos()" />
+
+  <table>
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Precio</th>
+        <th>Cantidad</th>
+        <th>Total</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="productList"></tbody>
+  </table>
+
+  <h2 id="totalVentasDisplay">Total de Ventas: $0.00</h2>
+
+  <h2>Historial de Ventas</h2>
+  <ul id="historialVentas"></ul>
+
+  <h2>Reporte de Ventas por Producto</h2>
+  <div class="center-buttons">
+    <button onclick="exportarReportePDF()">Exportar a PDF</button>
+  </div>
+
+  <!-- Modal de método de pago -->
+  <div id="metodoPagoModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Selecciona método de pago</h3>
+      <button onclick="confirmarMetodoPago('efectivo')">Efectivo</button>
+      <button onclick="confirmarMetodoPago('mp')">Mercado Pago</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
