@@ -50,6 +50,12 @@
     <button onclick="exportarReportePDF()">Exportar a PDF</button>
   </div>
 
+  <h2>Exportar/Importar Datos</h2>
+  <div class="center-buttons">
+    <button onclick="exportarDatos()">Exportar Datos</button>
+    <input type="file" id="importFile" accept=".json" onchange="importarDatos()" />
+  </div>
+
   <!-- Modal de método de pago -->
   <div id="metodoPagoModal" class="modal hidden">
     <div class="modal-content">

@@ -7,8 +7,8 @@ let totalVentas = parseFloat(localStorage.getItem('totalVentas')) || 0;
 let ventasTurno = 0;
 let historialVentas = JSON.parse(localStorage.getItem('historialVentas')) || [];
 let ventasPorProducto = JSON.parse(localStorage.getItem('ventasPorProducto')) || {};
-let turnoId = null;
-let turnoActivo = false;
+let turnoId = localStorage.getItem('turnoId') || null;
+let turnoActivo = localStorage.getItem('turnoActivo') === 'true';
 
 document.addEventListener('DOMContentLoaded', () => {
   renderTotalVentas();
@@ -39,7 +39,7 @@ function cerrarTurno() {
   turnoActivo = false;
   alert(`Turno cerrado.\nTotal vendido: $${ventasTurno.toFixed(2)}`);
   ventasTurno = 0;
-  renderEstadoTurno();
+  saveAndRender();
 }
 
 form.addEventListener('submit', (e) => {
@@ -131,6 +131,8 @@ function saveAndRender() {
   localStorage.setItem('totalVentas', totalVentas.toFixed(2));
   localStorage.setItem('historialVentas', JSON.stringify(historialVentas));
   localStorage.setItem('ventasPorProducto', JSON.stringify(ventasPorProducto));
+  localStorage.setItem('turnoActivo', turnoActivo);
+  localStorage.setItem('turnoId', turnoId);
   renderProducts();
   renderTotalVentas();
   renderHistorialVentas();
@@ -162,10 +164,12 @@ function exportarReportePDF() {
   doc.setFontSize(16);
   doc.text("Reporte de Ventas por Producto", 14, 20);
   let y = 30;
+
   for (const [turno, productos] of Object.entries(ventasPorProducto)) {
     doc.setFontSize(14);
     doc.text(`Turno: ${turno}`, 14, y);
     y += 8;
+
     doc.setFontSize(12);
     doc.text("Producto", 14, y);
     doc.text("Unidades", 70, y);
@@ -173,6 +177,10 @@ function exportarReportePDF() {
     doc.text("Efectivo", 140, y);
     doc.text("MP", 170, y);
     y += 8;
+
+    let totalEfectivo = 0;
+    let totalMP = 0;
+
     for (const [nombre, datos] of Object.entries(productos)) {
       doc.text(nombre, 14, y);
       doc.text(`${datos.unidades}`, 70, y);
@@ -180,12 +188,68 @@ function exportarReportePDF() {
       doc.text(`$${(datos.efectivo || 0).toFixed(2)}`, 140, y);
       doc.text(`$${(datos.mp || 0).toFixed(2)}`, 170, y);
       y += 8;
+
+      totalEfectivo += datos.efectivo || 0;
+      totalMP += datos.mp || 0;
+
       if (y > 280) {
         doc.addPage();
         y = 20;
       }
     }
+
+    doc.setFontSize(12);
+    doc.text(`Total Efectivo: $${totalEfectivo.toFixed(2)}`, 14, y);
+    y += 8;
+    doc.text(`Total Mercado Pago: $${totalMP.toFixed(2)}`, 14, y);
     y += 10;
   }
+
   doc.save("reporte_ventas.pdf");
+}
+
+function exportarDatos() {
+  const datos = {
+    products,
+    historialVentas,
+    ventasPorProducto,
+    totalVentas,
+    turnoActivo,
+    turnoId
+  };
+
+  const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'datos_stock.json';
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function importarDatos() {
+  const input = document.getElementById('importFile');
+  const file = input.files[0];
+  if (!file) return alert('No se seleccionó ningún archivo.');
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.products || !Array.isArray(data.products)) throw new Error("El archivo no contiene productos válidos.");
+
+      products = data.products;
+      historialVentas = data.historialVentas || [];
+      ventasPorProducto = data.ventasPorProducto || {};
+      totalVentas = parseFloat(data.totalVentas) || 0;
+      turnoActivo = !!data.turnoActivo;
+      turnoId = data.turnoId || null;
+
+      saveAndRender();
+      alert('Datos importados correctamente.');
+    } catch (err) {
+      alert('Error al importar datos: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
 }
