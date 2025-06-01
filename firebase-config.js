@@ -3,13 +3,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  // 🔁 REEMPLAZAR con tu configuración de Firebase
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_DOMINIO.firebaseapp.com",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "xxx",
-  messagingSenderId: "xxx",
-  appId: "xxx"
+  apiKey: "AIzaSyDFzT8YssfvzYoLOojwZg4zQBD6n30Lm2Q",
+  authDomain: "control-stock-c1d77.firebaseapp.com",
+  projectId: "control-stock-c1d77",
+  storageBucket: "control-stock-c1d77.firebasestorage.app",
+  messagingSenderId: "1083635451031",
+  appId: "1:1083635451031:web:09386c2f1a103888b695d2"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -161,3 +160,4 @@ function filtrarProductos() {
     filas[index].style.display = visible ? '' : 'none';
   });
 }
+
